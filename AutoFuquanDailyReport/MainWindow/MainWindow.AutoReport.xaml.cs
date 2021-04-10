@@ -30,6 +30,8 @@ namespace AutoFuquanDailyReport
             info = sheetOfPierAndBeam.Cells[4, 11].Value.ToString();
 
             const int dataRows = 24; const int dataColumns = 8;
+
+            //东、西主桥、D匝道桥墩测点水平位移、沉降监测数据汇总表
             decimal[,] PierData = new decimal[35, 12];
             for (int i = 0; i < 35; i++)
             {
@@ -56,6 +58,53 @@ namespace AutoFuquanDailyReport
 
             }
 
+            //东、西主桥、D匝道桥墩垂直度监测数据汇总表
+            const int PerpRowIndex = 61;
+            decimal[,] PerpData = new decimal[15, 8];
+            for (int i = 0; i < 15; i++)
+            {
+                //前次累积值
+                PerpData[i, 0] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 11].Value);
+                PerpData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 12].Value);
+
+                //本次累积值
+                PerpData[i, 2] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 5].Value);
+                PerpData[i, 3] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 6].Value);
+
+                //本次变化值
+                PerpData[i, 4] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 3].Value);
+                PerpData[i, 5] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 4].Value);
+
+                //本次变化速率
+                PerpData[i, 6] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 3].Value);
+                PerpData[i, 7] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 4].Value);
+            }
+
+            //东、西主桥、D匝道主梁测点水平位移、沉降监测数据汇总表
+            const int BeamNodes = 15; const int BeamRowIndex = 40;
+            decimal[,] BeamData = new decimal[BeamNodes, 12];
+            for (int i = 0; i < BeamNodes; i++)
+            {
+                //前次累积值
+                BeamData[i, 0] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 11].Value);
+                BeamData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 12].Value);
+                BeamData[i, 2] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 13].Value);
+
+                //本次累积值
+                BeamData[i, 3] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 6].Value);
+                BeamData[i, 4] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 7].Value);
+                BeamData[i, 5] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 8].Value);
+                //本次变化值
+                BeamData[i, 6] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 3].Value);
+                BeamData[i, 7] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 4].Value);
+                BeamData[i, 8] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 5].Value);
+
+                //本次变化速率
+                BeamData[i, 9] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 3].Value);
+                BeamData[i, 10] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 4].Value);
+                BeamData[i, 11] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 5].Value);
+
+            }
             //MessageBox.Show(info);
 
             try
@@ -67,6 +116,10 @@ namespace AutoFuquanDailyReport
 
                 Table table0 = doc.GetChildNodes(NodeType.Table, true)[0] as Table;
 
+                Table perpTable = doc.GetChildNodes(NodeType.Table, true)[2] as Table;    //东、西主桥、D匝道桥墩垂直度监测数据汇总表
+
+                Table beamTable = doc.GetChildNodes(NodeType.Table, true)[3] as Table;    //东、西主桥、D匝道主梁测点水平位移、沉降监测数据汇总表
+
                 //东、西主桥、D匝道桥墩测点水平位移、沉降监测数据汇总表
                 for (int i = 0; i < PierData.GetLength(0); i++)
                 {
@@ -74,6 +127,27 @@ namespace AutoFuquanDailyReport
                     {
                         builder.MoveTo(table0.Rows[i + 2].Cells[j + 2].FirstParagraph);    //3行2列
                         builder.Write(PierData[i, j].ToString());
+                    }
+
+                }
+                //东、西主桥、D匝道桥墩垂直度监测数据汇总表
+                for (int i = 0; i < PerpData.GetLength(0); i++)
+                {
+                    for (int j = 0; j < PerpData.GetLength(1); j++)
+                    {
+                        builder.MoveTo(perpTable.Rows[i + 2].Cells[j + 1].FirstParagraph);    //3行2列
+                        builder.Write($"{PerpData[i, j]:P}");
+                    }
+
+                }
+
+                //东、西主桥、D匝道主梁测点水平位移、沉降监测数据汇总表
+                for (int i = 0; i < BeamData.GetLength(0); i++)
+                {
+                    for (int j = 0; j < BeamData.GetLength(1); j++)
+                    {
+                        builder.MoveTo(beamTable.Rows[i + 2].Cells[j + 1].FirstParagraph);    //3行2列
+                        builder.Write($"{BeamData[i, j]}");
                     }
 
                 }
