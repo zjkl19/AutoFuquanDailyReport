@@ -15,7 +15,7 @@ namespace AutoFuquanDailyReport
         private async void TestButton_Click(object sender, RoutedEventArgs e)
         {
             string info;
-            FileInfo fileInfo = new FileInfo("20210409福泉主线日报数据处理.xlsx");
+            FileInfo fileInfo = new FileInfo("福泉主线日报数据处理.xlsx");
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage(fileInfo))
             {
@@ -23,7 +23,6 @@ namespace AutoFuquanDailyReport
                 //ExcelRange range = sheet.Cells[1, 1, 100000, 200];
                 await package.SaveAsync();
                 info = sheet.Cells[4, 11].Value.ToString();
-
 
             }
             MessageBox.Show(info);
