@@ -25,6 +25,8 @@ namespace AutoFuquanDailyReport
             var package = new ExcelPackage(fileInfo);
 
             var sheetOfPierAndBeam = package.Workbook.Worksheets["桥墩及主梁报告内表格数据"];
+            var sheetOfGround = package.Workbook.Worksheets["地表沉降报告内数据"];
+
             //ExcelRange range = sheet.Cells[1, 1, 100000, 200];
             await package.SaveAsync();
             info = sheetOfPierAndBeam.Cells[4, 11].Value.ToString();
@@ -105,7 +107,62 @@ namespace AutoFuquanDailyReport
                 BeamData[i, 11] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 5].Value);
 
             }
-            //MessageBox.Show(info);
+
+            //涵洞测点沉降监测数据汇总表
+            const int GroundNodes = 18; const int GroundRowIndex = 4;
+            decimal[,] groundData = new decimal[GroundNodes, 4];
+            int[] GroundRowIndexList = { 4,5,6,7,8,9,22,23,24,25,26,27,28,29,30,31,32,33};
+            int[] tIndex = { 14, 9, 6, 6 };    //excel中所在列
+            int k;
+
+            for (int i = 0; i < GroundNodes; i++)
+            {
+                k = 0;
+                foreach (var item in tIndex)
+                {
+                    try
+                    {
+                        groundData[i, k] = Convert.ToDecimal(sheetOfGround.Cells[GroundRowIndexList[i], item].Value);
+                    }
+                    catch (Exception)
+                    {
+
+                        groundData[i, k] = -9999m;
+                    }
+                    
+                    k++;
+                }
+
+                //前次累积值
+                //groundData[i, 0] = Convert.ToDecimal(sheetOfGround.Cells[i + GroundRowIndex, 14].Value);
+                //本次累积值
+                //groundData[i, 1] = Convert.ToDecimal(sheetOfGround.Cells[i + GroundRowIndex, 9].Value);
+                //本次变化值
+                //groundData[i, 2] = Convert.ToDecimal(sheetOfGround.Cells[i + GroundRowIndex, 6].Value);
+                //本次变化速率
+                //groundData[i, 3] = Convert.ToDecimal(sheetOfGround.Cells[i + GroundRowIndex, 6].Value);
+            }
+
+            const int CulvertNodes = 28; const int CulvertRowIndex = 34;
+            decimal[,] culvertData = new decimal[CulvertNodes, 4];
+            for (int i = 0; i < CulvertNodes; i++)
+            {
+                k = 0;
+                foreach (var item in tIndex)
+                {
+                    try
+                    {
+                        culvertData[i, k] = Convert.ToDecimal(sheetOfGround.Cells[i + CulvertRowIndex, item].Value);
+                    }
+                    catch (Exception)
+                    {
+
+                        culvertData[i, k] = -9999m;
+                    }
+
+                    k++;
+                }
+            }
 
             try
             {
@@ -119,6 +176,10 @@ namespace AutoFuquanDailyReport
                 Table perpTable = doc.GetChildNodes(NodeType.Table, true)[2] as Table;    //东、西主桥、D匝道桥墩垂直度监测数据汇总表
 
                 Table beamTable = doc.GetChildNodes(NodeType.Table, true)[3] as Table;    //东、西主桥、D匝道主梁测点水平位移、沉降监测数据汇总表
+
+                Table groundTable = doc.GetChildNodes(NodeType.Table, true)[4] as Table;    //地表沉降及路基横断面测点沉降监测数据汇总表
+
+                Table culvertTable = doc.GetChildNodes(NodeType.Table, true)[5] as Table;    //涵洞测点沉降监测数据汇总表
 
                 //东、西主桥、D匝道桥墩测点水平位移、沉降监测数据汇总表
                 for (int i = 0; i < PierData.GetLength(0); i++)
@@ -149,7 +210,33 @@ namespace AutoFuquanDailyReport
                         builder.MoveTo(beamTable.Rows[i + 2].Cells[j + 1].FirstParagraph);    //3行2列
                         builder.Write($"{BeamData[i, j]}");
                     }
+                }
+                //地表沉降及路基横断面测点沉降监测数据汇总表
+                for (int i = 0; i < groundData.GetLength(0); i++)
+                {
+                    for (int j = 0; j < groundData.GetLength(1); j++)
+                    {
+                        builder.MoveTo(groundTable.Rows[i + 1].Cells[j + 1].FirstParagraph);    //3行2列
+                        builder.Write($"{groundData[i, j]:F1}");
+                    }
+                }
 
+                //涵洞测点沉降监测数据汇总表
+                for (int i = 0; i < culvertData.GetLength(0); i++)
+                {
+                    for (int j = 0; j < culvertData.GetLength(1); j++)
+                    {
+                        builder.MoveTo(culvertTable.Rows[i + 1].Cells[j + 1].FirstParagraph);    //3行2列
+                        if (Math.Abs(culvertData[i, j]) > 100)
+                        {
+                            builder.Write($"/");
+                        }
+                        else
+                        {
+                            builder.Write($"{culvertData[i, j]:F1}");
+                        }
+                        
+                    }
                 }
 
                 //excel表格"桥墩及主梁报告内表格数据"标签中，前一日累计变化值(mm)、累积变化值(mm)及本次变化值(mm)
