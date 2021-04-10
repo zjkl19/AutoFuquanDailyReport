@@ -4,9 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoFuquanDailyReport"
+        xmlns:sys1="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
         Title="福泉自动日报" Height="250" Width="400">
-    <Grid>
-        
-    </Grid>
+    <StackPanel >
+        <StackPanel.Resources>
+            <sys1:Thickness x:Key="defaultMargin">5</sys1:Thickness>
+            <sys1:Thickness x:Key="buttonMargin">5</sys1:Thickness>
+        </StackPanel.Resources>
+
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
+            <Button Click="AutoReport_Click" Margin="{StaticResource buttonMargin}">生成日报</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
+            <Button Click="TestButton_Click" Margin="{StaticResource buttonMargin}">测试</Button>
+        </StackPanel>
+    </StackPanel  >
 </Window>
