@@ -90,6 +90,7 @@
   <ItemGroup>
     <Compile Include="MainWindow\MainWindow.AutoReport.xaml.cs" />
     <Compile Include="MainWindow\MainWindow.TestButton.xaml.cs" />
+    <Compile Include="MainWindow\MainWindow.TransferGraphData.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

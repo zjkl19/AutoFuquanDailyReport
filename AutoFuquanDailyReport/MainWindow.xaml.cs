@@ -23,6 +23,7 @@ namespace AutoFuquanDailyReport
         public MainWindow()
         {
             InitializeComponent();
+            ReportTime.SelectedDate = DateTime.Now;
         }
 
 

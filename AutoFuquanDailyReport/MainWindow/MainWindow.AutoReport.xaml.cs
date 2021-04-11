@@ -16,11 +16,11 @@ namespace AutoFuquanDailyReport
     {
         private async void AutoReport_Click(object sender, RoutedEventArgs e)
         {
-            string templateFile = @"Templates\福泉互通病害整治工程--桥墩加固施工监测日报表模板.docx";
-            string outputFile = @"OutputReport\自动生成的福泉互通病害整治工程--桥墩加固施工监测日报表.docx";
+            string templateFile = $"{App.TemplateFolder}\\福泉互通病害整治工程--桥墩加固施工监测日报表模板.docx";
+            string outputFile = $"{App.OutputFolder}\\自动生成的福泉互通病害整治工程--桥墩加固施工监测日报表.docx";
 
             string info;
-            FileInfo fileInfo = new FileInfo(@"OriginalData\福泉主线日报数据处理.xlsx");
+            FileInfo fileInfo = new FileInfo($"{App.InputFolder}\\福泉主线日报数据处理.xlsx");
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var package = new ExcelPackage(fileInfo);
 

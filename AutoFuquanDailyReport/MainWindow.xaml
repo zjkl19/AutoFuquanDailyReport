@@ -12,12 +12,18 @@
             <sys1:Thickness x:Key="defaultMargin">5</sys1:Thickness>
             <sys1:Thickness x:Key="buttonMargin">5</sys1:Thickness>
         </StackPanel.Resources>
-
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
+            <Label>报告时间（默认为今天）</Label>
+            <DatePicker Width="100" Name="ReportTime"></DatePicker>
+        </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
             <Button Click="AutoReport_Click" Margin="{StaticResource buttonMargin}">生成日报</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
             <Button Click="TestButton_Click" Margin="{StaticResource buttonMargin}">测试</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
+            <Button Click="TransferGraphData_Click" Margin="{StaticResource buttonMargin}">复制图表数据</Button>
         </StackPanel>
     </StackPanel  >
 </Window>
