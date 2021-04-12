@@ -42,6 +42,48 @@ namespace AutoFuquanDailyReport
                 PerpData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 6].Value);
             }
 
+            //地表
+            const int GroundNodes = 18; const int GroundRowIndex = 4;
+            decimal[,] groundData = new decimal[GroundNodes, 1];
+            int[] GroundRowIndexList = { 4, 5, 6, 7, 8, 9, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 };
+
+            for (int i = 0; i < GroundNodes; i++)
+            {
+                try
+                {
+                    groundData[i, 0] = Convert.ToDecimal(sheetOfGround.Cells[GroundRowIndexList[i], 9].Value);
+                }
+                catch (Exception)
+                {
+
+                    groundData[i, 0] = App.AbnormalData;
+                }
+            }
+            //涵洞
+            const int CulvertNodes = 28; const int CulvertRowIndex = 34;
+            decimal[,] culvertData = new decimal[CulvertNodes, 1];
+            for (int i = 0; i < CulvertNodes; i++)
+            {
+                try
+                {
+                    culvertData[i, 0] = Convert.ToDecimal(sheetOfGround.Cells[i + CulvertRowIndex, 9].Value);
+                }
+                catch (Exception)
+                {
+                    culvertData[i, 0] = App.AbnormalData;
+                }
+            }
+
+            //主梁
+            const int BeamNodes = 15; const int BeamRowIndex = 40;
+            decimal[,] BeamData = new decimal[BeamNodes, 12];
+            for (int i = 0; i < BeamNodes; i++)
+            {
+                BeamData[i, 0] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 6].Value);   
+                BeamData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 7].Value);
+                BeamData[i, 2] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 8].Value);
+            }
+
             //将数据写入到汇总表中
             FileInfo saveFileInfo = new FileInfo($"{App.InputFolder}\\数据汇总表.xlsx");
 
@@ -52,6 +94,13 @@ namespace AutoFuquanDailyReport
 
             var sheetOfPerpY = savePackage.Workbook.Worksheets["桥墩垂直度Y"];
             var sheetOfPerpX = savePackage.Workbook.Worksheets["桥墩垂直度X"];
+
+            var sheetOfGroundZ = savePackage.Workbook.Worksheets["地表及路基沉降"];
+            var sheetOfCulvertZ = savePackage.Workbook.Worksheets["涵洞沉降"];
+
+            var sheetOfBeamY = savePackage.Workbook.Worksheets["主梁Y"];
+            var sheetOfBeamX = savePackage.Workbook.Worksheets["主梁X"];
+            var sheetOfBeamZ = savePackage.Workbook.Worksheets["主梁Z"];
 
             const int MaxSearchCol = 3000;    //最大搜索列数
             const int SavePierRowIndex = 2;
@@ -93,17 +142,54 @@ namespace AutoFuquanDailyReport
             sheetOfPerpY.Cells[SavePerpRowIndex, colCurr].Value = dateInWorksheet;
             for (int i = 0; i < PerpNodes; i++)
             {
-                sheetOfPerpY.Cells[i + SavePerpRowIndex + 1, colCurr].Value = $"{PerpData[i, 0]:P}";
+                sheetOfPerpY.Cells[i + SavePerpRowIndex + 1, colCurr].Value = PerpData[i, 0];
+                sheetOfPerpY.Cells[i + SavePerpRowIndex + 1, colCurr].Style.Numberformat.Format = "0.00%";
             }
-
             
+
             colCurr = SearchCol(sheetOfPerpX, MaxSearchCol, SavePerpRowIndex, 2);
             sheetOfPerpX.Cells[SavePerpRowIndex, colCurr].Value = dateInWorksheet;
             for (int i = 0; i < PerpNodes; i++)
             {
-                sheetOfPerpX.Cells[i + SavePerpRowIndex + 1, colCurr].Value = $"{PerpData[i, 1]:P}"; //Math.Round(PerpData[i, 1], 1);
+                sheetOfPerpX.Cells[i + SavePerpRowIndex + 1, colCurr].Value = PerpData[i, 1]; //Math.Round(PerpData[i, 1], 1);
+                sheetOfPerpX.Cells[i + SavePerpRowIndex + 1, colCurr].Style.Numberformat.Format = "0.00%";
             }
 
+            const int DefaultSaveRowIndex= 2;
+            colCurr = SearchCol(sheetOfGroundZ, MaxSearchCol, DefaultSaveRowIndex, 3);
+            sheetOfGroundZ.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < GroundNodes; i++)
+            {
+                sheetOfGroundZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(groundData[i, 0], 1);
+            }
+
+            colCurr = SearchCol(sheetOfCulvertZ, MaxSearchCol, DefaultSaveRowIndex, 3);
+            sheetOfCulvertZ.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < CulvertNodes; i++)
+            {
+                sheetOfCulvertZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(culvertData[i, 0], 1);
+            }
+
+            colCurr = SearchCol(sheetOfBeamY, MaxSearchCol, DefaultSaveRowIndex, 3);
+            sheetOfBeamY.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < BeamNodes; i++)
+            {
+                sheetOfBeamY.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(BeamData[i, 0], 1);
+            }
+
+            colCurr = SearchCol(sheetOfBeamX, MaxSearchCol, DefaultSaveRowIndex, 3);
+            sheetOfBeamX.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < BeamNodes; i++)
+            {
+                sheetOfBeamX.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(BeamData[i, 1], 1);
+            }
+
+            colCurr = SearchCol(sheetOfBeamZ, MaxSearchCol, DefaultSaveRowIndex, 3);
+            sheetOfBeamZ.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < BeamNodes; i++)
+            {
+                sheetOfBeamZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(BeamData[i, 2], 1);
+            }
 
             FileInfo saveAsFileInfo = new FileInfo($"{App.OutputFolder}\\{day.AddDays(1):yyyyMMdd}数据汇总表.xlsx");
 

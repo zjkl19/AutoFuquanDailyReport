@@ -187,7 +187,7 @@ namespace AutoFuquanDailyReport
                     for (int j = 0; j < PierData.GetLength(1); j++)
                     {
                         builder.MoveTo(table0.Rows[i + 2].Cells[j + 2].FirstParagraph);    //3行2列
-                        builder.Write(PierData[i, j].ToString());
+                        builder.Write($"{PierData[i, j]:F1}");
                     }
 
                 }
@@ -208,7 +208,7 @@ namespace AutoFuquanDailyReport
                     for (int j = 0; j < BeamData.GetLength(1); j++)
                     {
                         builder.MoveTo(beamTable.Rows[i + 2].Cells[j + 1].FirstParagraph);    //3行2列
-                        builder.Write($"{BeamData[i, j]}");
+                        builder.Write($"{BeamData[i, j]:F1}");
                     }
                 }
                 //地表沉降及路基横断面测点沉降监测数据汇总表
