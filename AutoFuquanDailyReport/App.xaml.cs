@@ -22,6 +22,7 @@ namespace AutoFuquanDailyReport
         public static string InputFolder = "Input";
         public static string OutputFolder = "Output";
         public static string TemplateFolder = "Templates";
+        public static decimal NotApplicableData = 200m;    //仅为正值，若数据绝对值大于该值，则值为异常值
         public static decimal AbnormalData = -9999m;
     }
 }

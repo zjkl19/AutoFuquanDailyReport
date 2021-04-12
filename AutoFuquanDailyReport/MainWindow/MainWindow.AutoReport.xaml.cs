@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Aspose.Words;
 using Aspose.Words.Tables;
+using AutoFuquanDailyReport.Services;
 using OfficeOpenXml;
 
 namespace AutoFuquanDailyReport
@@ -17,10 +18,12 @@ namespace AutoFuquanDailyReport
         private async void AutoReport_Click(object sender, RoutedEventArgs e)
         {
             string templateFile = $"{App.TemplateFolder}\\福泉互通病害整治工程--桥墩加固施工监测日报表模板.docx";
-            string outputFile = $"{App.OutputFolder}\\自动生成的福泉互通病害整治工程--桥墩加固施工监测日报表.docx";
+            string outputFile = $"{App.OutputFolder}\\{DateTime.Now:yyyyMMdd}自动生成的福泉互通病害整治工程--桥墩加固施工监测日报表.docx";
 
             string info;
-            FileInfo fileInfo = new FileInfo($"{App.InputFolder}\\福泉主线日报数据处理.xlsx");
+                       
+            //FileInfo fileInfo = new FileInfo($"{App.InputFolder}\\福泉主线日报数据处理.xlsx");
+            FileInfo fileInfo = new FileInfo(FileService.GetFileName(App.InputFolder, "福泉主线日报数据处理", "xlsx"));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var package = new ExcelPackage(fileInfo);
 

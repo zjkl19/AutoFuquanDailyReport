@@ -74,6 +74,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Services\FileService.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -108,7 +109,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="OriginalData\20210409福泉主线日报数据处理.xlsx" />
+    <None Include="Input\20210409福泉主线日报数据处理 - 副本.xlsx" />
+    <None Include="Input\20210409福泉主线日报数据处理.xlsx" />
+    <None Include="Input\数据汇总表20210409.xls" />
+    <None Include="Input\数据汇总表20210409.xlsx" />
+    <None Include="Output\20210409福泉互通病害整治工程--桥墩加固施工监测日报表.doc" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -124,6 +129,7 @@
   <ItemGroup>
     <Content Include="AsposeWordsNet\.gitignore" />
     <Content Include="AsposeWordsNet\Aspose.Words.dll" />
+    <Content Include="Input\.gitignore" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

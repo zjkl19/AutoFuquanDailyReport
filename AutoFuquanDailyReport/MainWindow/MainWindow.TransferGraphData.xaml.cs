@@ -7,6 +7,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows;
 using OfficeOpenXml;
+using AutoFuquanDailyReport.Services;
 
 namespace AutoFuquanDailyReport
 {
@@ -16,7 +17,10 @@ namespace AutoFuquanDailyReport
         private async void TransferGraphData_Click(object sender, RoutedEventArgs e)
         {
             string info;
-            FileInfo fileInfo = new FileInfo($"{App.InputFolder}\\福泉主线日报数据处理.xlsx");
+
+            //var k = FileService.GetFileName(App.InputFolder, "福泉主线日报数据处理","xlsx");
+            //FileInfo fileInfo = new FileInfo($"{App.InputFolder}\\福泉主线日报数据处理.xlsx");
+            FileInfo fileInfo = new FileInfo(FileService.GetFileName(App.InputFolder, "福泉主线日报数据处理", "xlsx"));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var package = new ExcelPackage(fileInfo);
 
@@ -85,7 +89,9 @@ namespace AutoFuquanDailyReport
             }
 
             //将数据写入到汇总表中
-            FileInfo saveFileInfo = new FileInfo($"{App.InputFolder}\\数据汇总表.xlsx");
+
+            //FileInfo saveFileInfo = new FileInfo($"{App.InputFolder}\\数据汇总表.xlsx");    //参考代码
+            FileInfo saveFileInfo = new FileInfo(FileService.GetFileName(App.InputFolder, "数据汇总表", "xlsx"));
 
             var savePackage = new ExcelPackage(saveFileInfo);
             var sheetOfPierY = savePackage.Workbook.Worksheets["桥墩水平位移Y"];
@@ -166,8 +172,15 @@ namespace AutoFuquanDailyReport
             colCurr = SearchCol(sheetOfCulvertZ, MaxSearchCol, DefaultSaveRowIndex, 3);
             sheetOfCulvertZ.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
             for (int i = 0; i < CulvertNodes; i++)
-            {
-                sheetOfCulvertZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(culvertData[i, 0], 1);
+            {                
+                if (Math.Abs(culvertData[i, 0]) > 100)
+                {
+                    sheetOfCulvertZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value="/";
+                }
+                else
+                {
+                    sheetOfCulvertZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(culvertData[i, 0], 1);
+                }
             }
 
             colCurr = SearchCol(sheetOfBeamY, MaxSearchCol, DefaultSaveRowIndex, 3);
