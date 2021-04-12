@@ -34,7 +34,13 @@ namespace AutoFuquanDailyReport
                 PierData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PierRowIndex, 7].Value);    //X
                 PierData[i, 2] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PierRowIndex, 8].Value);    //Z
             }
-
+            const int PerpNodes = 15; const int PerpRowIndex = 61;
+            decimal[,] PerpData = new decimal[PerpNodes, 3];
+            for (int i = 0; i < PerpNodes; i++)
+            {
+                PerpData[i, 0] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 5].Value);
+                PerpData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 6].Value);
+            }
 
             //将数据写入到汇总表中
             FileInfo saveFileInfo = new FileInfo($"{App.InputFolder}\\数据汇总表.xlsx");
@@ -43,6 +49,9 @@ namespace AutoFuquanDailyReport
             var sheetOfPierY = savePackage.Workbook.Worksheets["桥墩水平位移Y"];
             var sheetOfPierX = savePackage.Workbook.Worksheets["桥墩水平位移X"];
             var sheetOfPierZ = savePackage.Workbook.Worksheets["桥墩沉降Z"];
+
+            var sheetOfPerpY = savePackage.Workbook.Worksheets["桥墩垂直度Y"];
+            var sheetOfPerpX = savePackage.Workbook.Worksheets["桥墩垂直度X"];
 
             const int MaxSearchCol = 3000;    //最大搜索列数
             const int SavePierRowIndex = 2;
@@ -77,6 +86,22 @@ namespace AutoFuquanDailyReport
             for (int i = 0; i < PierNodes; i++)
             {
                 sheetOfPierZ.Cells[i + SavePierRowIndex + 1, colCurr].Value = Math.Round(PierData[i, 2], 1);
+            }
+
+            const int SavePerpRowIndex = 2;
+            colCurr = SearchCol(sheetOfPerpY, MaxSearchCol, SavePerpRowIndex, 2);
+            sheetOfPerpY.Cells[SavePerpRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < PerpNodes; i++)
+            {
+                sheetOfPerpY.Cells[i + SavePerpRowIndex + 1, colCurr].Value = $"{PerpData[i, 0]:P}";
+            }
+
+            
+            colCurr = SearchCol(sheetOfPerpX, MaxSearchCol, SavePerpRowIndex, 2);
+            sheetOfPerpX.Cells[SavePerpRowIndex, colCurr].Value = dateInWorksheet;
+            for (int i = 0; i < PerpNodes; i++)
+            {
+                sheetOfPerpX.Cells[i + SavePerpRowIndex + 1, colCurr].Value = $"{PerpData[i, 1]:P}"; //Math.Round(PerpData[i, 1], 1);
             }
 
 
