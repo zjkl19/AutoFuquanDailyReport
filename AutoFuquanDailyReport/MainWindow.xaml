@@ -18,6 +18,7 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
             <Button Click="AutoReport_Click" Margin="{StaticResource buttonMargin}">生成日报</Button>
+            <Button Click="OpenReport_Click" Margin="{StaticResource buttonMargin}">打开日报</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
             <Button Click="TestButton_Click" Margin="{StaticResource buttonMargin}">测试</Button>

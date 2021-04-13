@@ -18,7 +18,7 @@ namespace AutoFuquanDailyReport.Services
         /// <returns></returns>
         public static string GetFileName(string folderName, string fileName, string fileExtension)
         {
-            var dirs = Directory.GetFiles($@"{folderName}/", $"*{fileName}*.{fileExtension}");    //结果含有路径
+            var dirs = Directory.GetFiles($@"{folderName}\", $"*{fileName}*.{fileExtension}");    //结果含有路径
 
             return dirs[0];
         }
