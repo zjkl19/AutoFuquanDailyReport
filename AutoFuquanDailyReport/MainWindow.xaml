@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AutoFuquanDailyReport"
         xmlns:sys1="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
-        Title="福泉自动日报" Height="250" Width="400">
+        Title="福泉自动日报 v0.5" Height="250" Width="400">
     <StackPanel >
         <StackPanel.Resources>
             <sys1:Thickness x:Key="defaultMargin">5</sys1:Thickness>
@@ -21,11 +21,11 @@
             <Button Click="OpenReport_Click" Margin="{StaticResource buttonMargin}">打开日报</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
-            <Button Click="TestButton_Click" Margin="{StaticResource buttonMargin}">测试</Button>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
             <Button Click="TransferGraphData_Click" Margin="{StaticResource buttonMargin}">复制图表数据</Button>
             <Button Click="OpenDataSummary_Click" Margin="{StaticResource buttonMargin}">打开数据汇总表</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource defaultMargin}">
+            <Button Click="TestButton_Click" Margin="{StaticResource buttonMargin}">测试用按钮</Button>
         </StackPanel>
     </StackPanel  >
 </Window>

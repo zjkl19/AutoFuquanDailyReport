@@ -24,6 +24,9 @@ namespace AutoFuquanDailyReport
         {
             InitializeComponent();
             ReportTime.SelectedDate = DateTime.Now;
+
+            this.Top = 0.4 * (App.ScreenHeight - this.Height);
+            this.Left = 0.5 * (App.ScreenWidth - this.Width);
         }
 
 

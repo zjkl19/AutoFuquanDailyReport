@@ -21,26 +21,48 @@ namespace AutoFuquanDailyReport
     {
         private async void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
             FileInfo fileInfo = new FileInfo(FileService.GetFileName(App.InputFolder, "数据汇总表", "xlsx"));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage(fileInfo))
             {
-                var sheet = package.Workbook.Worksheets["桥墩水平位移Y"];
+                //var sheet = package.Workbook.Worksheets["桥墩水平位移Y"];
 
-                var chart = sheet.Drawings["图表 1"] as ExcelLineChart;
-                
-                ExcelLineChartSerie series = chart.Series[0];
-                for(int i=0;i<chart.Series.Count;i++)
+                //var chart = sheet.Drawings["图表 1"] as ExcelLineChart;
+
+                //ExcelLineChartSerie series = chart.Series[0];
+                foreach(var sheet in package.Workbook.Worksheets)    //TODO：没有考虑没有工作表的情况
                 {
-                    series = chart.Series[i];
-                    series.Series = sheet.Cells[i+3, 4, i+3, 43].FullAddress;
+                    if (sheet.Drawings.Count > 0)    //TODO：考虑有图片的情况
+                    {
+                        foreach (var drawing in sheet.Drawings)
+                        {
+                            var chart = drawing as ExcelLineChart;    //强制转换
+                            if (chart.Series.Count > 0)
+                            {
+                                foreach (var series in chart.Series)
+                                {
+                                    var xAddr = new ExcelAddress(series.XSeries);    //x轴+1
+                                    series.XSeries = sheet.Cells[xAddr.Start.Row, xAddr.Start.Column, xAddr.End.Row, xAddr.End.Column + 1].Address;
+
+                                    var addr = new ExcelAddress(series.Series);    //数据量+1
+                                    series.Series = sheet.Cells[addr.Start.Row, addr.Start.Column, addr.End.Row, addr.End.Column + 1].Address;
+                                    //series.Series = sheet.Cells[i+3, 4, i+3, 43].Address;    //参考代码
+
+                                }
+                            }
+                        }
+                    }
                 }
+                
+
+
+
                 FileInfo saveAsfileInfo = new FileInfo($"{App.InputFolder}\\Test数据汇总表.xlsx");
                 await package.SaveAsAsync(saveAsfileInfo);
 
                 //var excelPicture = sheet.Drawings[0] as ExcelPicture;
-                
+
                 //var img = excelPicture.Image; // This is of type System.Drawing.Image
                 //img.Save(string.Format("img-1.png"), ImageFormat.Png);
             }

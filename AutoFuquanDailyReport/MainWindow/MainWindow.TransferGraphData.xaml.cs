@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Windows;
 using OfficeOpenXml;
 using AutoFuquanDailyReport.Services;
+using OfficeOpenXml.Drawing.Chart;
 
 namespace AutoFuquanDailyReport
 {
@@ -83,7 +84,7 @@ namespace AutoFuquanDailyReport
             decimal[,] BeamData = new decimal[BeamNodes, 12];
             for (int i = 0; i < BeamNodes; i++)
             {
-                BeamData[i, 0] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 6].Value);   
+                BeamData[i, 0] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 6].Value);
                 BeamData[i, 1] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 7].Value);
                 BeamData[i, 2] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 8].Value);
             }
@@ -151,7 +152,7 @@ namespace AutoFuquanDailyReport
                 sheetOfPerpY.Cells[i + SavePerpRowIndex + 1, colCurr].Value = PerpData[i, 0];
                 sheetOfPerpY.Cells[i + SavePerpRowIndex + 1, colCurr].Style.Numberformat.Format = "0.00%";
             }
-            
+
 
             colCurr = SearchCol(sheetOfPerpX, MaxSearchCol, SavePerpRowIndex, 2);
             sheetOfPerpX.Cells[SavePerpRowIndex, colCurr].Value = dateInWorksheet;
@@ -161,7 +162,7 @@ namespace AutoFuquanDailyReport
                 sheetOfPerpX.Cells[i + SavePerpRowIndex + 1, colCurr].Style.Numberformat.Format = "0.00%";
             }
 
-            const int DefaultSaveRowIndex= 2;
+            const int DefaultSaveRowIndex = 2;
             colCurr = SearchCol(sheetOfGroundZ, MaxSearchCol, DefaultSaveRowIndex, 3);
             sheetOfGroundZ.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
             for (int i = 0; i < GroundNodes; i++)
@@ -172,10 +173,10 @@ namespace AutoFuquanDailyReport
             colCurr = SearchCol(sheetOfCulvertZ, MaxSearchCol, DefaultSaveRowIndex, 3);
             sheetOfCulvertZ.Cells[DefaultSaveRowIndex, colCurr].Value = dateInWorksheet;
             for (int i = 0; i < CulvertNodes; i++)
-            {                
+            {
                 if (Math.Abs(culvertData[i, 0]) > 100)
                 {
-                    sheetOfCulvertZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value="/";
+                    sheetOfCulvertZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = "/";
                 }
                 else
                 {
@@ -204,6 +205,14 @@ namespace AutoFuquanDailyReport
                 sheetOfBeamZ.Cells[i + DefaultSaveRowIndex + 1, colCurr].Value = Math.Round(BeamData[i, 2], 1);
             }
 
+
+            //var sheet = package.Workbook.Worksheets["桥墩水平位移Y"];
+
+            //var chart = sheet.Drawings["图表 1"] as ExcelLineChart;
+
+            //ExcelLineChartSerie series = chart.Series[0];
+            UpdateExcelChart(savePackage);
+
             FileInfo saveAsFileInfo = new FileInfo($"{App.OutputFolder}\\{day.AddDays(1):yyyyMMdd}数据汇总表.xlsx");
 
             // Save our new workbook in the output directory and we are done!
@@ -211,6 +220,37 @@ namespace AutoFuquanDailyReport
 
             MessageBox.Show("数据复制完成！");
         }
+        /// <summary>
+        /// 保存的excel表格中Chart数据更新
+        /// </summary>
+        /// <param name="savePackage"></param>
+        private static void UpdateExcelChart(ExcelPackage savePackage)
+        {
+            foreach (var sheet in savePackage.Workbook.Worksheets)    //TODO：没有考虑没有工作表的情况
+            {
+                if (sheet.Drawings.Count > 0)    //TODO：考虑有图片的情况
+                {
+                    foreach (var drawing in sheet.Drawings)
+                    {
+                        var chart = drawing as ExcelLineChart;    //强制转换
+                        if (chart.Series.Count > 0)
+                        {
+                            foreach (var series in chart.Series)
+                            {
+                                var xAddr = new ExcelAddress(series.XSeries);    //x轴+1
+                                series.XSeries = sheet.Cells[xAddr.Start.Row, xAddr.Start.Column, xAddr.End.Row, xAddr.End.Column + 1].Address;
+
+                                var addr = new ExcelAddress(series.Series);    //数据量+1
+                                series.Series = sheet.Cells[addr.Start.Row, addr.Start.Column, addr.End.Row, addr.End.Column + 1].Address;
+                                //series.Series = sheet.Cells[i+3, 4, i+3, 43].Address;    //参考代码
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// 查找第1个空列
         /// </summary>
