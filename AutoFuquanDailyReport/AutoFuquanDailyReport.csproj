@@ -130,6 +130,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Templates\福泉互通病害整治工程--桥墩加固施工监测日报表模板 - 副本.docx" />
     <None Include="Templates\福泉互通病害整治工程--桥墩加固施工监测日报表模板.docx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

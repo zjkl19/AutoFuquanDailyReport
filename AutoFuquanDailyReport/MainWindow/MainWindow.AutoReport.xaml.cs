@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Aspose.Words;
+using Aspose.Words.Fields;
 using Aspose.Words.Tables;
 using AutoFuquanDailyReport.Services;
 using OfficeOpenXml;
@@ -21,7 +22,7 @@ namespace AutoFuquanDailyReport
             string outputFile = $"{App.OutputFolder}\\{DateTime.Now:yyyyMMdd}自动生成的福泉互通病害整治工程--桥墩加固施工监测日报表.docx";
 
             string info;
-                       
+
             //FileInfo fileInfo = new FileInfo($"{App.InputFolder}\\福泉主线日报数据处理.xlsx");
             FileInfo fileInfo = new FileInfo(FileService.GetFileName(App.InputFolder, "福泉主线日报数据处理", "xlsx"));
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -114,7 +115,7 @@ namespace AutoFuquanDailyReport
             //涵洞测点沉降监测数据汇总表
             const int GroundNodes = 18; const int GroundRowIndex = 4;
             decimal[,] groundData = new decimal[GroundNodes, 4];
-            int[] GroundRowIndexList = { 4,5,6,7,8,9,22,23,24,25,26,27,28,29,30,31,32,33};
+            int[] GroundRowIndexList = { 4, 5, 6, 7, 8, 9, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 };
             int[] tIndex = { 14, 9, 6, 6 };    //excel中所在列
             int k;
 
@@ -132,7 +133,7 @@ namespace AutoFuquanDailyReport
 
                         groundData[i, k] = -9999m;
                     }
-                    
+
                     k++;
                 }
 
@@ -170,6 +171,43 @@ namespace AutoFuquanDailyReport
             try
             {
                 var doc = new Document(templateFile);
+
+                //更新文档变量
+                try
+                {
+                    var variables = doc.Variables;
+
+                    variables["ReportDate"] = (ReportTime.SelectedDate ?? DateTime.Now).ToString("yyyy年MM月dd日");
+                    variables["MonitorTime"] = (ReportTime.SelectedDate ?? DateTime.Now).ToString("yyyy年MM月dd日");
+
+
+                }
+                catch (Exception ex)
+                {
+
+                    Debug.Print($"文档变量更新失败。信息{ex.Message}");
+                }
+
+                doc.UpdateFields();
+
+                for (int i = 0; i < doc.Range.Fields.Count; i++)
+                {
+                    var v = (FieldDocVariable)doc.Range.Fields[i];
+                    if (v.VariableName == "ReportDate")
+                    {
+                        v.Unlink();
+                    }
+
+                }
+
+                for (int i = 0; i < doc.Range.Fields.Count; i++)
+                {
+                    var v = (FieldDocVariable)doc.Range.Fields[i];
+                    if (v.VariableName == "MonitorTime")
+                    {
+                        v.Unlink();
+                    }
+                }
 
 
                 var builder = new DocumentBuilder(doc);
@@ -238,7 +276,7 @@ namespace AutoFuquanDailyReport
                         {
                             builder.Write($"{culvertData[i, j]:F1}");
                         }
-                        
+
                     }
                 }
 
