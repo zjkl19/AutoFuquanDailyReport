@@ -86,6 +86,8 @@
     <Compile Include="MainWindow\MainWindow.OpenDataSummary.xaml.cs" />
     <Compile Include="MainWindow\MainWindow.OpenReport.xaml.cs" />
     <Compile Include="Models\BeamMeasurePoint.cs" />
+    <Compile Include="Models\CulvertMeasurePoint.cs" />
+    <Compile Include="Models\GroundMeasurePoint.cs" />
     <Compile Include="Models\MeasurePoint.cs" />
     <Compile Include="Models\PerpMeasurePoint.cs" />
     <Compile Include="Models\PierMeasurePoint.cs" />

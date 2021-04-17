@@ -28,7 +28,10 @@ namespace AutoFuquanDailyReport
         public static int PierMeasurePointCounts = 35;    //桥墩测点数
         public static int PerpMeasurePointCounts = 15;    //垂直度测点数
         public static int BeamMeasurePointCounts = 15;    //主梁测点数
+        public static int GroundMeasurePointCounts = 18;    //地表沉降及路基横断面测点数
+        public static int CulvertMeasurePointCounts = 28;    //涵洞测点数
 
+        public static decimal CriticalData = 200m;    //异常值判断的临界值
         public static decimal NotApplicableData = 200m;    //仅为正值，若数据绝对值大于该值，则值为异常值
         public static decimal AbnormalData = -9999m;
     }

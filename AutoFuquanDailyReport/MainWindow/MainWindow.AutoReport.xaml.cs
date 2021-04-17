@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using Aspose.Words.Tables;
 using AutoFuquanDailyReport.Models;
 using AutoFuquanDailyReport.Services;
 using OfficeOpenXml;
+using static AutoFuquanDailyReport.App;
 
 namespace AutoFuquanDailyReport
 {
@@ -227,9 +229,34 @@ namespace AutoFuquanDailyReport
             //涵洞测点沉降监测数据汇总表
             const int GroundNodes = 18; const int GroundRowIndex = 4;
             decimal[,] groundData = new decimal[GroundNodes, 4];
+
+            var groundMeasurePoints = new GroundMeasurePoint[GroundMeasurePointCounts];
+
             int[] GroundRowIndexList = { 4, 5, 6, 7, 8, 9, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 };
             int[] tIndex = { 14, 9, 6, 6 };    //excel中所在列
             int k;
+
+            Func<string, decimal> processAbnormalValue = s =>
+            {
+                if (!decimal.TryParse(s, out decimal outPutValue))
+                {
+                    outPutValue = AbnormalData;
+                }
+                return outPutValue;
+            };
+
+            for (int i = 0; i < GroundMeasurePointCounts; i++)
+            {
+                groundMeasurePoints[i] = new GroundMeasurePoint
+                {
+                    No = sheetOfGround.Cells[GroundRowIndexList[i], 3]?.Value?.ToString() ?? string.Empty,
+                    PreviousAccumulateZ = processAbnormalValue(sheetOfGround.Cells[GroundRowIndexList[i], 14]?.Value?.ToString()),
+                    AccumulateZ = processAbnormalValue(sheetOfGround.Cells[GroundRowIndexList[i], 9]?.Value?.ToString()),
+                    DeltaZ = processAbnormalValue(sheetOfGround.Cells[GroundRowIndexList[i], 6]?.Value?.ToString()),
+                    RateOfChangeZ = processAbnormalValue(sheetOfGround.Cells[GroundRowIndexList[i], 6]?.Value?.ToString()),
+                };
+
+            }
 
             for (int i = 0; i < GroundNodes; i++)
             {
@@ -260,6 +287,21 @@ namespace AutoFuquanDailyReport
             }
 
             const int CulvertNodes = 28; const int CulvertRowIndex = 34;
+
+            var culvertMeasurePoints = new CulvertMeasurePoint[CulvertMeasurePointCounts];
+            for (int i = 0; i < CulvertMeasurePointCounts; i++)
+            {
+                culvertMeasurePoints[i] = new CulvertMeasurePoint
+                {
+                    No = sheetOfGround.Cells[i + CulvertRowIndex, 3]?.Value?.ToString() ?? string.Empty,
+                    PreviousAccumulateZ = processAbnormalValue(sheetOfGround.Cells[i + CulvertRowIndex, 14]?.Value?.ToString()),
+                    AccumulateZ = processAbnormalValue(sheetOfGround.Cells[i + CulvertRowIndex, 9]?.Value?.ToString()),
+                    DeltaZ = processAbnormalValue(sheetOfGround.Cells[i + CulvertRowIndex, 6]?.Value?.ToString()),
+                    RateOfChangeZ = processAbnormalValue(sheetOfGround.Cells[i + CulvertRowIndex, 6]?.Value?.ToString()),
+                };
+
+            }
+
             decimal[,] culvertData = new decimal[CulvertNodes, 4];
             for (int i = 0; i < CulvertNodes; i++)
             {
@@ -282,7 +324,7 @@ namespace AutoFuquanDailyReport
 
             try
             {
-                string[] MyDocumentVariables = new string[] { "ReportDate", "MonitorTime", "PierAndPerpConclusion","BeamConclusion" };//文档中包含的所有“文档变量”，方便遍历
+
 
                 var maxYPierMeasurePoints = pierMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateY)).First();
                 var maxXPierMeasurePoints = pierMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateX)).First();
@@ -294,14 +336,24 @@ namespace AutoFuquanDailyReport
                 var maxYPerpMeasurePoints = perpMeasurePoints.OrderByDescending(s => s.AccumulateY).First();
                 var maxXPerpMeasurePoints = perpMeasurePoints.OrderByDescending(s => s.AccumulateX).First();
 
-                string pierConclusion = $"桥墩横桥向累计最大水平位移为向{maxYPierMeasurePoints.YDirection}侧{Math.Abs(maxYPierMeasurePoints.AccumulateY):F1}mm（{maxYPierMeasurePoints.No}测点）；纵桥向累计最大水平位移为向{maxXPierMeasurePoints.XDirection}{Math.Abs(maxXPierMeasurePoints.AccumulateX):F1}mm（{maxXPierMeasurePoints.No}测点），最大沉降为{-1.0m*(maxZPierMeasurePoints.AccumulateZ):F1}mm（{maxZPierMeasurePoints.No}测点）。桥墩垂直度累计变化值在{Math.Min(minYPerpMeasurePoints.AccumulateY, minXPerpMeasurePoints.AccumulateX):P}~{Math.Max(maxYPerpMeasurePoints.AccumulateY, maxXPerpMeasurePoints.AccumulateX):P}之间。";
+                string PierAndPerpConclusion = $"桥墩横桥向累计最大水平位移为向{maxYPierMeasurePoints.YDirection}侧{Math.Abs(maxYPierMeasurePoints.AccumulateY):F1}mm（{maxYPierMeasurePoints.No}测点）；纵桥向累计最大水平位移为向{maxXPierMeasurePoints.XDirection}{Math.Abs(maxXPierMeasurePoints.AccumulateX):F1}mm（{maxXPierMeasurePoints.No}测点），最大沉降为{-1.0m * (maxZPierMeasurePoints.AccumulateZ):F1}mm（{maxZPierMeasurePoints.No}测点）。桥墩垂直度累计变化值在{Math.Min(minYPerpMeasurePoints.AccumulateY, minXPerpMeasurePoints.AccumulateX):P}~{Math.Max(maxYPerpMeasurePoints.AccumulateY, maxXPerpMeasurePoints.AccumulateX):P}之间。";
                 //注意垂直度把x和y放在一起比较的方法可能有问题
 
                 var maxYBeamMeasurePoints = beamMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateY)).First();
                 var maxXBeamMeasurePoints = beamMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateX)).First();
                 var maxZBeamMeasurePoints = beamMeasurePoints.OrderBy(s => s.AccumulateZ).First();    //实际上是最小值
 
-                string beamConclusion = $"主梁测点横桥向累计最大水平位移为向{maxYBeamMeasurePoints.YDirection}侧{Math.Abs(maxYBeamMeasurePoints.AccumulateY):F1}mm（{maxYBeamMeasurePoints.No}主梁测点）；纵桥向累计最大水平位移为向{maxXBeamMeasurePoints.XDirection}{Math.Abs(maxXBeamMeasurePoints.AccumulateX)}mm（{maxXBeamMeasurePoints.No}主梁测点），最大沉降为{-1.0m*(maxZBeamMeasurePoints.AccumulateZ):F1}mm（{maxZBeamMeasurePoints.No}主梁测点）。";
+                string BeamConclusion = $"主梁测点横桥向累计最大水平位移为向{maxYBeamMeasurePoints.YDirection}侧{Math.Abs(maxYBeamMeasurePoints.AccumulateY):F1}mm（{maxYBeamMeasurePoints.No}主梁测点）；纵桥向累计最大水平位移为向{maxXBeamMeasurePoints.XDirection}{Math.Abs(maxXBeamMeasurePoints.AccumulateX)}mm（{maxXBeamMeasurePoints.No}主梁测点），最大沉降为{-1.0m * maxZBeamMeasurePoints.AccumulateZ:F1}mm（{maxZBeamMeasurePoints.No}主梁测点）。";
+
+                var maxGroundMeasurePoints = groundMeasurePoints.Where(s => Math.Abs(s.AccumulateZ) < CriticalData).OrderBy(s => s.AccumulateZ).First();    //全站仪测试点向上为正
+                string GroundConclusion = $"路基和地表沉降测点中，累计沉降量最大值为{-1.0m * maxGroundMeasurePoints.AccumulateZ:F1}mm（{maxGroundMeasurePoints.No}测点）。";
+
+                var maxCulvertMeasurePoints = culvertMeasurePoints.Where(s=>Math.Abs(s.AccumulateZ)< CriticalData).OrderBy(s => s.AccumulateZ).First();    //全站仪测试点向上为正
+                string CulvertConclusion = $"涵洞测点最大沉降量为{-1.0m * maxCulvertMeasurePoints.AccumulateZ:F1}mm（{maxCulvertMeasurePoints.No}测点)。";
+
+                TextInfo myTI = new CultureInfo("en-US", false).TextInfo;
+                
+                string[] MyDocumentVariables = new string[] { "ReportDate", "MonitorTime", "PierAndPerpConclusion", "BeamConclusion", "GroundConclusion", nameof(CulvertConclusion) };//文档中包含的所有“文档变量”，方便遍历
 
                 var doc = new Document(templateFile);
 
@@ -311,8 +363,10 @@ namespace AutoFuquanDailyReport
                     var variables = doc.Variables;
                     variables["ReportDate"] = (ReportTime.SelectedDate ?? DateTime.Now).ToString("yyyy年MM月dd日");
                     variables["MonitorTime"] = (ReportTime.SelectedDate ?? DateTime.Now).ToString("yyyy年MM月dd日");
-                    variables["PierAndPerpConclusion"] = pierConclusion;
-                    variables["BeamConclusion"] = beamConclusion;
+                    variables[nameof(PierAndPerpConclusion)] = PierAndPerpConclusion;
+                    variables[nameof(BeamConclusion)] = BeamConclusion;
+                    variables[nameof(GroundConclusion)] = GroundConclusion;
+                    variables[nameof(CulvertConclusion)] = CulvertConclusion;
                 }
                 catch (Exception ex)
                 {
@@ -419,5 +473,6 @@ namespace AutoFuquanDailyReport
                 Debug.Print("报告生成失败，请检查原因！");
             }
         }
+
     }
 }
