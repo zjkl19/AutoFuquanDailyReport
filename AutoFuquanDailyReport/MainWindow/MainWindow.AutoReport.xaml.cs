@@ -9,6 +9,7 @@ using System.Windows;
 using Aspose.Words;
 using Aspose.Words.Fields;
 using Aspose.Words.Tables;
+using AutoFuquanDailyReport.Models;
 using AutoFuquanDailyReport.Services;
 using OfficeOpenXml;
 
@@ -39,6 +40,7 @@ namespace AutoFuquanDailyReport
 
             //东、西主桥、D匝道桥墩测点水平位移、沉降监测数据汇总表
             decimal[,] PierData = new decimal[35, 12];
+            //数据合并成一个表格，方便插入word
             for (int i = 0; i < 35; i++)
             {
 
@@ -64,9 +66,85 @@ namespace AutoFuquanDailyReport
 
             }
 
+            //List<PierMeasurePoint> pierMeasurePoints = new List<PierMeasurePoint>(App.PierMeasurePointCounts);
+
+            PierMeasurePoint[] pierMeasurePoints = new PierMeasurePoint[App.PierMeasurePointCounts];
+
+            for (int i = 0; i < App.PierMeasurePointCounts; i++)
+            {
+                pierMeasurePoints[i] = new PierMeasurePoint
+                {
+                    No = sheetOfPierAndBeam.Cells[4 + i, 2]?.Value?.ToString() ?? string.Empty
+                    ,
+                    //前次累积值
+                    PreviousAccumulateY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 11].Value)
+                    ,
+                    PreviousAccumulateX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 12].Value)
+                    ,
+                    PreviousAccumulateZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 13].Value)
+                    //本次累积值
+                    ,
+                    AccumulateY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 6].Value)
+                    ,
+                    AccumulateX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 7].Value)
+                    ,
+                    AccumulateZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 8].Value)
+                    //本次变化值
+                    ,
+                    DeltaY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 3].Value)
+                    ,
+                    DeltaX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 4].Value)
+                    ,
+                    DeltaZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 5].Value)
+
+                    //本次变化速率
+                    ,
+                    RateOfChangeY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 3].Value)
+                    ,
+                    RateOfChangeX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 4].Value)
+                    ,
+                    RateOfChangeZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[4 + i, 5].Value)
+                };
+                //TODO：消除硬编码（放到excel中）
+                pierMeasurePoints[i].YDirection = pierMeasurePoints[i].GetYDirection("东", "西");    //每个测点要分开设置，以下同理
+                pierMeasurePoints[i].XDirection = pierMeasurePoints[i].GetXDirection("大里程", "小里程");
+                pierMeasurePoints[i].ZDirection = pierMeasurePoints[i].GetXDirection("上", "下");    //20210417暂定
+            }
+
             //东、西主桥、D匝道桥墩垂直度监测数据汇总表
             const int PerpRowIndex = 61;
             decimal[,] PerpData = new decimal[15, 8];
+
+            PerpMeasurePoint[] perpMeasurePoints = new PerpMeasurePoint[App.PerpMeasurePointCounts];
+            for (int i = 0; i < App.PerpMeasurePointCounts; i++)
+            {
+                perpMeasurePoints[i] = new PerpMeasurePoint
+                {
+                    No = sheetOfPierAndBeam.Cells[PerpRowIndex + i, 2]?.Value?.ToString() ?? string.Empty
+                    ,
+                    //前次累积值
+                    PreviousAccumulateY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 11].Value)
+                    ,
+                    PreviousAccumulateX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 12].Value)
+                    //本次累积值
+                    ,
+                    AccumulateY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 5].Value)
+                    ,
+                    AccumulateX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 6].Value)
+                    //本次变化值
+                    ,
+                    DeltaY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 3].Value)
+                    ,
+                    DeltaX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 4].Value)
+
+                    //本次变化速率
+                    ,
+                    RateOfChangeY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 3].Value)
+                    ,
+                    RateOfChangeX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + PerpRowIndex, 4].Value)
+                };
+            }
+
             for (int i = 0; i < 15; i++)
             {
                 //前次累积值
@@ -89,6 +167,39 @@ namespace AutoFuquanDailyReport
             //东、西主桥、D匝道主梁测点水平位移、沉降监测数据汇总表
             const int BeamNodes = 15; const int BeamRowIndex = 40;
             decimal[,] BeamData = new decimal[BeamNodes, 12];
+            var beamMeasurePoints = new BeamMeasurePoint[App.BeamMeasurePointCounts];
+            for (int i = 0; i < App.BeamMeasurePointCounts; i++)
+            {
+                beamMeasurePoints[i] = new BeamMeasurePoint
+                {
+                    No = sheetOfPierAndBeam.Cells[i + BeamRowIndex, 2]?.Value?.ToString() ?? string.Empty,
+                    //前次累积值
+                    PreviousAccumulateY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 11].Value),
+                    PreviousAccumulateX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 12].Value),
+                    PreviousAccumulateZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 13].Value),
+
+                    //本次累积值
+                    AccumulateY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 6].Value),
+                    AccumulateX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 7].Value),
+                    AccumulateZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 8].Value),
+                    //本次变化值
+                    DeltaY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 3].Value),
+                    DeltaX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 4].Value),
+                    DeltaZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 5].Value),
+
+                    //本次变化速率
+                    RateOfChangeY = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 3].Value),
+                    RateOfChangeX = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 4].Value),
+                    RateOfChangeZ = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 5].Value),
+
+                };
+                //TODO：消除硬编码（放到excel中）
+                beamMeasurePoints[i].YDirection = beamMeasurePoints[i].GetYDirection("东", "西");    //每个测点要分开设置，以下同理
+                beamMeasurePoints[i].XDirection = beamMeasurePoints[i].GetXDirection("大里程", "小里程");
+                beamMeasurePoints[i].ZDirection = beamMeasurePoints[i].GetXDirection("上", "下");    //20210417暂定
+
+            }
+
             for (int i = 0; i < BeamNodes; i++)
             {
                 //前次累积值
@@ -111,6 +222,7 @@ namespace AutoFuquanDailyReport
                 BeamData[i, 11] = Convert.ToDecimal(sheetOfPierAndBeam.Cells[i + BeamRowIndex, 5].Value);
 
             }
+
 
             //涵洞测点沉降监测数据汇总表
             const int GroundNodes = 18; const int GroundRowIndex = 4;
@@ -170,17 +282,37 @@ namespace AutoFuquanDailyReport
 
             try
             {
+                string[] MyDocumentVariables = new string[] { "ReportDate", "MonitorTime", "PierAndPerpConclusion","BeamConclusion" };//文档中包含的所有“文档变量”，方便遍历
+
+                var maxYPierMeasurePoints = pierMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateY)).First();
+                var maxXPierMeasurePoints = pierMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateX)).First();
+                var maxZPierMeasurePoints = pierMeasurePoints.OrderBy(s => s.AccumulateZ).First();    //实际上是最小值
+
+                var minYPerpMeasurePoints = perpMeasurePoints.OrderBy(s => s.AccumulateY).First();
+                var minXPerpMeasurePoints = perpMeasurePoints.OrderBy(s => s.AccumulateX).First();
+
+                var maxYPerpMeasurePoints = perpMeasurePoints.OrderByDescending(s => s.AccumulateY).First();
+                var maxXPerpMeasurePoints = perpMeasurePoints.OrderByDescending(s => s.AccumulateX).First();
+
+                string pierConclusion = $"桥墩横桥向累计最大水平位移为向{maxYPierMeasurePoints.YDirection}侧{Math.Abs(maxYPierMeasurePoints.AccumulateY):F1}mm（{maxYPierMeasurePoints.No}测点）；纵桥向累计最大水平位移为向{maxXPierMeasurePoints.XDirection}{Math.Abs(maxXPierMeasurePoints.AccumulateX):F1}mm（{maxXPierMeasurePoints.No}测点），最大沉降为{-1.0m*(maxZPierMeasurePoints.AccumulateZ):F1}mm（{maxZPierMeasurePoints.No}测点）。桥墩垂直度累计变化值在{Math.Min(minYPerpMeasurePoints.AccumulateY, minXPerpMeasurePoints.AccumulateX):P}~{Math.Max(maxYPerpMeasurePoints.AccumulateY, maxXPerpMeasurePoints.AccumulateX):P}之间。";
+                //注意垂直度把x和y放在一起比较的方法可能有问题
+
+                var maxYBeamMeasurePoints = beamMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateY)).First();
+                var maxXBeamMeasurePoints = beamMeasurePoints.OrderByDescending(s => Math.Abs(s.AccumulateX)).First();
+                var maxZBeamMeasurePoints = beamMeasurePoints.OrderBy(s => s.AccumulateZ).First();    //实际上是最小值
+
+                string beamConclusion = $"主梁测点横桥向累计最大水平位移为向{maxYBeamMeasurePoints.YDirection}侧{Math.Abs(maxYBeamMeasurePoints.AccumulateY):F1}mm（{maxYBeamMeasurePoints.No}主梁测点）；纵桥向累计最大水平位移为向{maxXBeamMeasurePoints.XDirection}{Math.Abs(maxXBeamMeasurePoints.AccumulateX)}mm（{maxXBeamMeasurePoints.No}主梁测点），最大沉降为{-1.0m*(maxZBeamMeasurePoints.AccumulateZ):F1}mm（{maxZBeamMeasurePoints.No}主梁测点）。";
+
                 var doc = new Document(templateFile);
 
                 //更新文档变量
                 try
                 {
                     var variables = doc.Variables;
-
                     variables["ReportDate"] = (ReportTime.SelectedDate ?? DateTime.Now).ToString("yyyy年MM月dd日");
                     variables["MonitorTime"] = (ReportTime.SelectedDate ?? DateTime.Now).ToString("yyyy年MM月dd日");
-
-
+                    variables["PierAndPerpConclusion"] = pierConclusion;
+                    variables["BeamConclusion"] = beamConclusion;
                 }
                 catch (Exception ex)
                 {
@@ -190,25 +322,15 @@ namespace AutoFuquanDailyReport
 
                 doc.UpdateFields();
 
-                for (int i = 0; i < doc.Range.Fields.Count; i++)
+                foreach (var v in doc.Range.Fields)
                 {
-                    var v = (FieldDocVariable)doc.Range.Fields[i];
-                    if (v.VariableName == "ReportDate")
+                    var v1 = (FieldDocVariable)v;
+                    if (MyDocumentVariables.Contains(v1.VariableName))
                     {
-                        v.Unlink();
+                        v1.Unlink();
                     }
 
                 }
-
-                for (int i = 0; i < doc.Range.Fields.Count; i++)
-                {
-                    var v = (FieldDocVariable)doc.Range.Fields[i];
-                    if (v.VariableName == "MonitorTime")
-                    {
-                        v.Unlink();
-                    }
-                }
-
 
                 var builder = new DocumentBuilder(doc);
 
@@ -221,6 +343,8 @@ namespace AutoFuquanDailyReport
                 Table groundTable = doc.GetChildNodes(NodeType.Table, true)[4] as Table;    //地表沉降及路基横断面测点沉降监测数据汇总表
 
                 Table culvertTable = doc.GetChildNodes(NodeType.Table, true)[5] as Table;    //涵洞测点沉降监测数据汇总表
+
+
 
                 //东、西主桥、D匝道桥墩测点水平位移、沉降监测数据汇总表
                 for (int i = 0; i < PierData.GetLength(0); i++)
@@ -286,7 +410,7 @@ namespace AutoFuquanDailyReport
 
                 doc.UpdateFields();
                 doc.Save(outputFile, SaveFormat.Docx);
-                MessageBox.Show("成功生成报告！");
+                MessageBox.Show("成功生成报告！请再核对一遍自动报告的结果，防止出错。");
 
             }
             catch (Exception ex)

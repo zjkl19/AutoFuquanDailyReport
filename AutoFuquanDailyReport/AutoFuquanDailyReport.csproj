@@ -85,6 +85,10 @@
     </ApplicationDefinition>
     <Compile Include="MainWindow\MainWindow.OpenDataSummary.xaml.cs" />
     <Compile Include="MainWindow\MainWindow.OpenReport.xaml.cs" />
+    <Compile Include="Models\BeamMeasurePoint.cs" />
+    <Compile Include="Models\MeasurePoint.cs" />
+    <Compile Include="Models\PerpMeasurePoint.cs" />
+    <Compile Include="Models\PierMeasurePoint.cs" />
     <Compile Include="Services\FileService.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

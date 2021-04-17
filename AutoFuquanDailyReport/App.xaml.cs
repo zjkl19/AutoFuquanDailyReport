@@ -24,7 +24,10 @@ namespace AutoFuquanDailyReport
         public static string TemplateFolder = "Templates";
         public static string OutputReportFile = "自动生成的福泉互通病害整治工程--桥墩加固施工监测日报表.docx";
         public static string DataSummaryFile = "数据汇总表.xlsx";
-        
+
+        public static int PierMeasurePointCounts = 35;    //桥墩测点数
+        public static int PerpMeasurePointCounts = 15;    //垂直度测点数
+        public static int BeamMeasurePointCounts = 15;    //主梁测点数
 
         public static decimal NotApplicableData = 200m;    //仅为正值，若数据绝对值大于该值，则值为异常值
         public static decimal AbnormalData = -9999m;
